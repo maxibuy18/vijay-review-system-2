@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Vijay Jewellers — त्वरित रिव्यू (Auto-copy)</title>
+<style>
+  body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:18px;background:#f6f8fb;}
+  .card{max-width:760px;margin:28px auto;background:#fff;padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.06);}
+  h1{font-size:20px;margin:0 0 8px;}
+  .muted{color:#6b7280;font-size:14px;margin-bottom:12px;}
+  textarea{width:100%;min-height:140px;padding:12px;border-radius:8px;border:1px solid #e6e9ef;font-size:15px;resize:vertical;}
+  .actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+  button{padding:10px 14px;border-radius:8px;border:none;cursor:pointer;background:#2563eb;color:white;font-weight:600;}
+  .ghost{background:#f1f5f9;color:#0f172a;border:1px solid #e2e8f0;}
+  .note{font-size:13px;color:#374151;margin-top:12px;}
+  .status{font-size:13px;color:#6b7280;margin-left:10px;}
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Vijay Jewellers — त्वरित रिव्यू</h1>
+    <p class="muted">हम आपके लिए एक छोटा सुझाव तैयार करेंगे — बस पेस्ट करके सबमिट कर दें। (AI-generated draft)</p>
+
+    <div style="display:flex;gap:8px;align-items:center;">
+      <label>रेटिंग:
+        <select id="rating">
+          <option value="5">5 — उत्कृष्ट</option>
+          <option value="4">4 — बहुत अच्छा</option>
+          <option value="3">3 — अच्छा</option>
+          <option value="2">2 — ठीक-ठाक</option>
+          <option value="1">1 — कमजोर</option>
+        </select>
+      </label>
+      <label style="margin-left:8px">कब आये?: <input id="visit_when" placeholder="जैसे: अक्टूबर 2025" /></label>
+      <span id="status" class="status"></span>
+    </div>
+
+    <div style="margin-top:12px">
+      <textarea id="draft" placeholder="यहाँ ड्राफ्ट दिखेगा..." readonly></textarea>
+    </div>
+
+    <div class="actions">
+      <button id="manualCopy" class="ghost">अगर ऑटो कॉपी न हुआ तो यहाँ क्लिक करें — कॉपी करें</button>
+      <button id="openMaps">Google Review खोलें</button>
+      <button id="editBtn" class="ghost">ड्राफ्ट एडिट करें</button>
+    </div>
+
+    <p class="note">
+      नोट: हम सिर्फ ड्राफ्ट बनाते हैं। कृपया केवल वही सबमिट करें जो आपके वास्तविक अनुभव से मेल खाता हो।
+    </p>
+  </div>
+
+<script>
+(async function(){
+  // === IMPORTANT ===
+  // Replace the placeholder below with your backend URL before deploying frontend.
+  // Example: const API_BASE = "https://vijay-review-backend.onrender.com";
+  const API_BASE = "REPLACE_WITH_YOUR_BACKEND_URL";
+
+  const params = new URLSearchParams(location.search);
+  const placeId = params.get('place_id') || '';
+  const draftEl = document.getElementById('draft');
+  const status = document.getElementById('status');
+  const manualCopyBtn = document.getElementById('manualCopy');
+  const openMapsBtn = document.getElementById('openMaps');
+  const editBtn = document.getElementById('editBtn');
+
+  function getInputs(){ return {
+    rating: document.getElementById('rating').value,
+    visit_when: document.getElementById('visit_when').value
+  };}
+
+  async function fetchDraft(){
+    status.textContent = 'ड्राफ्ट बना रहे हैं…';
+    try {
+      const resp = await fetch(`${API_BASE}/api/generate-review`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({...getInputs(), place_id: placeId})
+      });
+      if(!resp.ok) throw new Error('server');
+      const data = await resp.json();
+      const text = data.text || (data?.draft) || '';
+      draftEl.value = text;
+      status.textContent = 'ड्राफ्ट तैयार';
+      return text;
+    } catch(err){
+      console.error(err);
+      status.textContent = 'ड्राफ्ट लाने में त्रुटि';
+      draftEl.value = '';
+      return '';
+    }
+  }
+
+  async function tryAutoCopy(text){
+    if(!text) return false;
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch(e){
+      console.warn('Auto copy failed', e);
+      return false;
+    }
+  }
+
+  function openMaps(){
+    const mapsUrl = `https://www.google.com/maps/place/?q=place_id:${placeId}`;
+    window.open(mapsUrl, '_blank');
+  }
+
+  const text = await fetchDraft();
+  const copied = await tryAutoCopy(text);
+
+  if(copied){
+    status.textContent = 'ड्राफ्ट क्लिपबोर्ड में कॉपी कर दिया गया है — Google में पेस्ट कर Submit करें';
+    setTimeout(()=> { openMaps(); }, 600);
+  } else {
+    status.textContent = 'कृपया "कॉपी करें" पर क्लिक कर कॉपी करें, फिर Google में पेस्ट कर सबमिट करें।';
+  }
+
+  manualCopyBtn.addEventListener('click', async ()=>{
+    const ok = await tryAutoCopy(draftEl.value);
+    if(ok) alert('रिव्यू क्लिपबोर्ड में कॉपी हो गया। अब Google Review पेज खोलिए और पेस्ट करके सबमिट करें।');
+    else {
+      draftEl.removeAttribute('readonly');
+      draftEl.select();
+      alert('कृपया टेक्स्ट को मैन्युअली कॉपी करें (Ctrl/Cmd+C)।');
+    }
+  });
+
+  openMapsBtn.addEventListener('click', ()=>openMaps());
+  editBtn.addEventListener('click', ()=>{ draftEl.removeAttribute('readonly'); draftEl.focus(); });
+
+  document.getElementById('rating').addEventListener('change', async ()=>{
+    const t = await fetchDraft();
+    const ok = await tryAutoCopy(t);
+    if(ok) status.textContent = 'नया ड्राफ्ट क्लिपबोर्ड में कॉपी कर दिया गया।';
+  });
+
+})();
+</script>
+</body>
+</html>
