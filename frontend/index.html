@@ -21,7 +21,7 @@
         <div class="stars">★★★★★</div>
         <textarea id="review-text" readonly></textarea><br>
         <button class="copy" onclick="copyReview()">कॉपी करें</button><br>
-        <a href="https://g.page/r/CQASqQgR4RvOEBE/review?rating=5" target="_blank" class="btn post">Google पर पोस्ट करें</a>
+        <a href="https://g.page/r/CQASqQgR4RvOEBE/review" target="_blank" class="btn post">Google पर पोस्ट करें</a>
         <p><small>कॉपी करके पेस्ट कर दें – 5 सेकंड का काम! ❤️</small></p>
     </div>
     <script>
@@ -39,8 +39,8 @@
             } catch {
                 // fallback
                 const fallback = language === 'english'
-                    ? "Amazing experience at Vijay Jewellers! Pure gold, latest designs, very helpful staff and reasonable prices. Highly recommended! ⭐⭐⭐⭐⭐"
-                    : "विजय ज्वैलर्स में शानदार अनुभव रहा! शुद्ध सोना, नए डिज़ाइन, स्टाफ बहुत मददगार और कीमत भी उचित। बेस्ट ज्वैलरी शॉप! ⭐⭐⭐⭐⭐";
+                    ? "Amazing experience at Vijay Jewellers! Pure gold, latest designs, very helpful staff and reasonable prices. Highly recommended!"
+                    : "विजय ज्वैलर्स में शानदार अनुभव रहा! शुद्ध सोना, नए डिज़ाइन, स्टाफ बहुत मददगार और कीमत भी उचित। बेस्ट ज्वैलरी शॉप!";
                 document.getElementById('review-text').value = fallback;
             }
         }
