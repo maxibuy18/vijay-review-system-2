@@ -1,51 +1,56 @@
-// server/server.js
-import express from "express";
-import fetch from "node-fetch";
-import bodyParser from "body-parser";
-import path from "path";
-import dotenv from "dotenv";
-dotenv.config();
+const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
+const openai = require('openai');
+
 const app = express();
-const __dirname = path.resolve();
+const client = new openai.OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "../frontend")));
-app.post("/api/generate-review", async (req, res) => {
-  const { rating, visit_when } = req.body || {};
-  const OPENAI_KEY = process.env.OPENAI_API_KEY;
-  if (!OPENAI_KEY) {
-    return res.status(500).json({ error: "OpenAI API key not configured." });
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// Google Review URL with 5-star pre-filled
+const PLACE_ID = 'CQASqQgR4RvOEBE';
+const GOOGLE_REVIEW_URL = `https://search.google.com/local/writereview?placeid=${PLACE_ID}&rating=5`;
+
+// Multiple prompts for variety
+const PROMPTS = [
+  'विजय ज्वैलर्स के लिए 60-80 शब्दों का ईमानदार 5 स्टार रिव्यू लिखो। सोने की शुद्धता, नवीनतम डिजाइन, सहायक स्टाफ और उचित मूल्य का उल्लेख करो। हिंदी-अंग्रेजी मिश्रण, प्राकृतिक टोन।',
+  'एक खुश ग्राहक की तरह विजय ज्वैलर्स का रिव्यू लिखो – अद्भुत संग्रह, भरोसेमंद, स्टाफ ने बहुत अच्छे से मार्गदर्शन किया। 70 शब्द, कैजुअल भाषा।',
+  'विजय ज्वैलर्स में शानदार खरीदारी अनुभव रहा। गुणवत्ता शीर्ष वर्ग, डिजाइन अनोखे, कीमत भी ठीक। स्टाफ का व्यवहार बहुत अच्छा। हिंदी में लिखो।',
+  'बेस्ट ज्वैलरी शॉप! शुद्ध सोना, सुंदर डिजाइन, दोस्ताना स्टाफ और बढ़िया कीमतें विजय ज्वैलर्स में। अत्यधिक अनुशंसित!'
+];
+
+app.post('/api/generate-review', async (req, res) => {
+  const { rating, visit_when } = req.body;
+  if (!client.apiKey) {
+    return res.status(500).json({ error: 'OpenAI API key is missing' });
   }
-  const prompt = `
-आप "Vijay Jewellers" के लिए एक छोटा, सरल और ईमानदार Google Review ड्राफ्ट तैयार करें।
-रेटिंग: ${rating || "N/A"}/5
-आने का समय: ${visit_when || "उपलब्ध नहीं"}
-रिव्यू 30–60 शब्दों का हो।
-अंत में जोड़ें: "कृपया केवल तभी सबमिट करें जब यह आपके वास्तविक अनुभव से मेल खाता हो।"
-`;
+
+  const randomPrompt = PROMPTS[Math.floor(Math.random() * PROMPTS.length)];
+  const fullPrompt = `${randomPrompt} रेटिंग: ${rating}, विजिट कब: ${visit_when || 'हाल ही में'}. आज की तारीख: ${new Date().toLocaleDateString('hi-IN')}.`;
+
   try {
-    const r = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENAI_KEY}`
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 150,
-        temperature: 0.7
-      })
+    const completion = await client.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: fullPrompt }],
+      max_tokens: 180,
+      temperature: 0.85
     });
-    const j = await r.json();
-    const text = j.choices?.[0]?.message?.content?.trim() || "";
-    res.json({ text });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Generation failed" });
+    const reviewText = completion.choices[0].message.content.trim();
+    res.json({ review: reviewText });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to generate review' });
   }
 });
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/index.html"));
+
+// Frontend serve करो (NFC वाला हिस्सा यहीं से चलेगा)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
 });
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
