@@ -4,21 +4,137 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vijay Jewellers Review</title>
+
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background: #f9f9f9; padding: 20px; }
-        .box { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .stars { font-size: 40px; color: gold; }
-        textarea { width: 100%; height: 120px; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 5px; }
-        button { margin: 10px; padding: 10px 20px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; }
-        .copy { background: #4285f4; color: white; }
-        .post-link { display: inline-block; margin: 10px; padding: 10px 20px; font-size: 16px; background: #34a853; color: white; text-decoration: none; border-radius: 5px; }
-        .post-link:hover { background: #2d8b45; }
+        body {
+            font-family: system-ui, sans-serif;
+            background: #f1f3f4;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Main Google-like Card */
+        .box {
+            max-width: 420px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 22px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin: 0 0 10px;
+        }
+
+        p {
+            margin: 5px 0;
+            color: #444;
+        }
+
+        /* Star Rating */
+        .stars {
+            font-size: 42px;
+            margin: 15px 0 10px;
+        }
+
+        .star {
+            color: #ccc;
+            cursor: pointer;
+            margin: 0 3px;
+            transition: 0.2s;
+            display: inline-block;
+        }
+
+        .star.selected {
+            color: #ffd600;
+        }
+
+        /* Textbox */
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            font-size: 15px;
+            border: 1px solid #dadce0;
+            background: #fff;
+            border-radius: 8px;
+            resize: none;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+
+        /* Buttons */
+        button {
+            width: 100%;
+            padding: 13px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            margin: 6px 0;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .generate {
+            background: #fbbc04;
+            color: #222;
+            font-weight: 600;
+        }
+        .generate:hover { background: #e0a902; }
+
+        .copy { background: #4285f4; }
+        .copy:hover { background: #2a65db; }
+
+        .post { background: #34a853; }
+        .post:hover { background: #22873e; }
+
+        #instruction {
+            font-size: 13px;
+            margin-top: 8px;
+            color: #5f6368;
+        }
+
+        /* MOBILE */
+        @media(max-width:480px){
+            .box {
+                margin: 10px;
+                padding: 18px;
+                border-radius: 10px;
+            }
+            .stars { font-size: 36px; }
+            h1 { font-size: 20px; }
+            textarea { height: 100px; font-size: 14px; }
+            button { padding: 12px; font-size: 14px; }
+        }
+
+        /* TABLET */
+        @media(min-width:481px) and (max-width:768px){
+            .box {
+                max-width: 500px;
+                padding: 26px;
+            }
+            .stars { font-size: 48px; }
+            textarea { height: 130px; }
+        }
+
+        /* DESKTOP */
+        @media(min-width:769px){
+            .box {
+                max-width: 500px;
+            }
+        }
     </style>
 </head>
+
 <body>
+
     <div class="box">
         <h1>विजय ज्वैलर्स को रिव्यू दें</h1>
         <p>NFC टैग स्कैन करके आप यहाँ पहुँचे! पहले रेटिंग चुनें।</p>
+
         <div class="stars" id="star-container">
             <span class="star" onclick="selectStar(1)">★</span>
             <span class="star" onclick="selectStar(2)">★</span>
@@ -26,81 +142,84 @@
             <span class="star" onclick="selectStar(4)">★</span>
             <span class="star selected" onclick="selectStar(5)">★</span>
         </div>
+
         <p><small>आपकी रेटिंग: <span id="selected-rating">5</span>/5</small></p>
-        <button class="generate" onclick="generateReview()">रिव्यू जेनरेट करें</button><br>
-        <textarea id="review-text" readonly placeholder="रेटिंग चुनकर जेनरेट करें..."></textarea><br>
-        <button class="copy" onclick="copyReview()" style="display:none;" id="copy-btn">कॉपी करें</button><br>
-        <button class="post" onclick="postToGoogle()" style="display:none;" id="post-btn">Google पर पोस्ट करें</button>
-        <p><small id="instruction">रिव्यू जेनरेट करने के बाद कॉपी करके Google पेज पर पेस्ट कर दें – 5 सेकंड का काम! ❤️</small></p>
+
+        <button class="generate" onclick="generateReview()">रिव्यू जेनरेट करें</button>
+
+        <textarea id="review-text" readonly placeholder="रेटिंग चुनकर जेनरेट करें..."></textarea>
+
+        <button class="copy" onclick="copyReview()" id="copy-btn" style="display:none;">कॉपी करें</button>
+
+        <button class="post" onclick="postToGoogle()" id="post-btn" style="display:none;">Google पर पोस्ट करें</button>
+
+        <p><small id="instruction">रिव्यू जेनरेट करने के बाद कॉपी करके Google पर पेस्ट करें ❤️</small></p>
     </div>
+
+    
     <script>
-        let selectedRating = 5; // डिफॉल्ट 5
+        let selectedRating = 5;
 
         function selectStar(rating) {
             selectedRating = rating;
-            document.getElementById('selected-rating').textContent = rating;
-            const stars = document.querySelectorAll('.star');
-            stars.forEach((star, index) => {
-                star.classList.toggle('selected', index < rating);
+            document.getElementById("selected-rating").textContent = rating;
+
+            document.querySelectorAll(".star").forEach((star, index) => {
+                star.classList.toggle("selected", index < rating);
             });
         }
 
         async function generateReview() {
-            const language = Math.random() < 0.5 ? 'hindi' : 'english';
+            const language = Math.random() < 0.5 ? "hindi" : "english";
+
             try {
-                const res = await fetch('/api/generate-review', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ rating: selectedRating, language: language })
+                const res = await fetch("/api/generate-review", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ rating: selectedRating, language }),
                 });
+
                 const data = await res.json();
-                document.getElementById('review-text').value = data.review;
-                document.getElementById('copy-btn').style.display = 'block';
-                document.getElementById('post-btn').style.display = 'block';
-                document.getElementById('instruction').textContent = 'रिव्यू तैयार है! कॉपी करके Google पर पेस्ट करें।';
+
+                document.getElementById("review-text").value = data.review;
             } catch {
-                const fallback = language === 'english'
-                    ? `Great experience at Vijay Jewellers! ${selectedRating} stars for quality and service.`
-                    : `विजय ज्वैलर्स में अच्छा अनुभव! ${selectedRating} स्टार क्वालिटी और सर्विस के लिए।`;
-                document.getElementById('review-text').value = fallback;
-                document.getElementById('copy-btn').style.display = 'block';
-                document.getElementById('post-btn').style.display = 'block';
-                document.getElementById('instruction').textContent = 'रिव्यू तैयार है! कॉपी करके Google पर पेस्ट करें।';
+                const fallback =
+                    language === "english"
+                        ? `Great experience at Vijay Jewellers! ${selectedRating} stars for quality and service.`
+                        : `विजय ज्वैलर्स में बहुत अच्छा अनुभव! ${selectedRating} स्टार क्वालिटी और सर्विस के लिए।`;
+
+                document.getElementById("review-text").value = fallback;
             }
+
+            document.getElementById("copy-btn").style.display = "block";
+            document.getElementById("post-btn").style.display = "block";
+            document.getElementById("instruction").textContent =
+                "रिव्यू तैयार है! कॉपी करके Google Review बॉक्स में पेस्ट करें।";
         }
 
         function copyReview() {
-            const t = document.getElementById('review-text');
-            if (t.value) {
-                navigator.clipboard.writeText(t.value).then(() => {
-                    alert('रिव्यू कॉपी हो गया!');
-                }).catch(() => {
-                    alert('कॉपी नहीं हुआ, मैन्युअली सिलेक्ट करके कॉपी कर लें।');
-                });
-            } else {
-                alert('पहले रिव्यू जेनरेट करें!');
-            }
+            const t = document.getElementById("review-text");
+
+            if (!t.value) return alert("पहले रिव्यू जेनरेट करें!");
+
+            navigator.clipboard.writeText(t.value)
+                .then(() => alert("रिव्यू कॉपी हो गया!"))
+                .catch(() => alert("कॉपी नहीं हुआ, manually कॉपी कर लें।"));
         }
 
         function postToGoogle() {
-            const t = document.getElementById('review-text');
-            if (t.value) {
-                // ऑटो कॉपी कर लो
-                navigator.clipboard.writeText(t.value).then(() => {
-                    // Google पेज खोलो
-                    window.open('https://g.page/r/CQASqQgR4RvOEBE/review', '_blank');
-                    // अलर्ट से पेस्ट करने का रिमाइंडर
-                    setTimeout(() => {
-                        alert('रिव्यू कॉपी हो गया! Google के रिव्यू बॉक्स पर क्लिक करें और पेस्ट करें (Ctrl+V या लॉन्ग प्रेस > Paste)।');
-                    }, 500);
-                }).catch(() => {
-                    alert('कॉपी नहीं हो पाया! मैन्युअली कॉपी करें और Google पेज खोलें।');
-                    window.open('https://g.page/r/CQASqQgR4RvOEBE/review', '_blank');
-                });
-            } else {
-                alert('पहले रिव्यू जेनरेट करें!');
-            }
+            const t = document.getElementById("review-text");
+
+            if (!t.value) return alert("पहले रिव्यू जेनरेट करें!");
+
+            navigator.clipboard.writeText(t.value).then(() => {
+                window.open("https://g.page/r/CQASqQgR4RvOEBE/review", "_blank");
+                setTimeout(() => {
+                    alert("रिव्यू कॉपी किया जा चुका है। Google Review बॉक्स में जाकर पेस्ट करें!");
+                }, 500);
+            });
         }
     </script>
+
 </body>
 </html>
