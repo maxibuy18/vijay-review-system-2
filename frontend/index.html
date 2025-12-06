@@ -5,47 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vijay Jewellers Review</title>
     <style>
-        body {font-family: system-ui; text-align: center; background: #f8f9fa; padding: 10px; margin: 0;}
-        .box {max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px #00000020;}
-        .stars {font-size: 50px; margin: 15px 0; cursor: pointer;}
-        .star {color: #ddd; transition: color 0.2s; display: inline-block; margin: 0 2px;}
-        .star.selected {color: #ffd700;}
-        textarea {width: 100%; height: 150px; padding: 12px; font-size: 16px; border: 1px solid #ddd; border-radius: 8px; margin: 10px 0; resize: vertical; box-sizing: border-box;}
-        button {margin: 8px; padding: 12px 24px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; color: white;}
-        .generate {background: #ff9800;}
-        .copy {background: #4285f4;}
-        .post {background: #34a853; width: 100%; padding: 14px; font-size: 18px;}
-        #instruction {font-size: 14px; color: #666; margin-top: 10px;}
-        /* PC/लैपटॉप (large screen) */
-        @media (min-width: 768px) {
-            body {padding: 20px;}
-            .box {padding: 30px; max-width: 500px;}
-            .stars {font-size: 60px;}
-            .star {margin: 0 5px;}
-            textarea {height: 160px; font-size: 16px;}
-            button {padding: 14px 28px; font-size: 18px;}
-            .post {width: 80%; padding: 16px;}
-        }
-        /* टैबलेट (medium screen) */
-        @media (min-width: 481px) and (max-width: 767px) {
-            .box {padding: 25px; max-width: 90%;}
-            .stars {font-size: 45px;}
-            textarea {height: 140px;}
-            button {padding: 12px 22px; font-size: 16px;}
-        }
-        /* मोबाइल (small screen) – Google जैसा compact */
-        @media (max-width: 480px) {
-            body {padding: 5px;}
-            .box {padding: 15px; margin: 5px; border-radius: 8px;}
-            .stars {font-size: 40px;}
-            .star {margin: 0 1px;}
-            textarea {height: 100px; font-size: 14px; padding: 10px; margin: 8px 0;}
-            button {margin: 5px; padding: 10px 20px; font-size: 14px; width: 100%;}
-            .post {width: 100%; padding: 12px; font-size: 16px;}
-            #instruction {font-size: 12px; margin-top: 5px;}
-            h1 {font-size: 20px;}
-            p {font-size: 14px;}
-        }
+        body { font-family: Arial, sans-serif; text-align: center; background: #f9f9f9; padding: 20px; }
+        .box { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .stars { font-size: 40px; color: gold; }
+        textarea { width: 100%; height: 120px; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 5px; }
+        button { margin: 10px; padding: 10px 20px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; }
+        .copy { background: #4285f4; color: white; }
+        .post-link { display: inline-block; margin: 10px; padding: 10px 20px; font-size: 16px; background: #34a853; color: white; text-decoration: none; border-radius: 5px; }
+        .post-link:hover { background: #2d8b45; }
     </style>
 </head>
 <body>
