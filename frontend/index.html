@@ -7,53 +7,79 @@
     <style>
         body {font-family: system-ui; text-align: center; background: #f8f9fa; padding: 20px;}
         .box {max-width: 90%; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px #00000015;}
-        .stars {font-size: 50px; margin: 15px 0;}
+        .stars {font-size: 50px; margin: 15px 0; cursor: pointer;}
+        .star {color: #ddd; transition: color 0.2s;}
+        .star.selected {color: #ffd700;}
         textarea {width: 100%; height: 150px; padding: 15px; font-size: 16px; border: 2px solid #ddd; border-radius: 12px; margin: 10px 0;}
         button, a.btn {margin: 10px; padding: 15px 30px; font-size: 18px; border: none; border-radius: 12px; cursor: pointer; text-decoration: none;}
+        .generate {background: #ff9800; color: white;}
         .copy {background: #4285f4; color: white;}
         .post {background: #34a853; color: white; display: inline-block; width: 85%;}
     </style>
 </head>
 <body>
     <div class="box">
-        <h1>विजय ज्वैलर्स को 5 स्टार रिव्यू दें</h1>
-        <p>NFC टैग स्कैन करके आप यहाँ पहुँचे! नीचे रिव्यू तैयार है।</p>
-        <div class="stars">★★★★★</div>
-        <textarea id="review-text" readonly></textarea><br>
-        <button class="copy" onclick="copyReview()">कॉपी करें</button><br>
-        <a href="https://g.page/r/CQASqQgR4RvOEBE/review" target="_blank" class="btn post">Google पर पोस्ट करें</a>
-        <p><small>कॉपी करके पेस्ट कर दें – 5 सेकंड का काम! ❤️</small></p>
+        <h1>विजय ज्वैलर्स को रिव्यू दें</h1>
+        <p>NFC टैग स्कैन करके आप यहाँ पहुँचे! पहले रेटिंग चुनें।</p>
+        <div class="stars" id="star-container">
+            <span class="star" onclick="selectStar(1)">★</span>
+            <span class="star" onclick="selectStar(2)">★</span>
+            <span class="star" onclick="selectStar(3)">★</span>
+            <span class="star" onclick="selectStar(4)">★</span>
+            <span class="star selected" onclick="selectStar(5)">★</span> <!-- डिफॉल्ट 5 -->
+        </div>
+        <p><small>आपकी रेटिंग: <span id="selected-rating">5</span>/5</small></p>
+        <button class="generate" onclick="generateReview()">रिव्यू जेनरेट करें</button><br>
+        <textarea id="review-text" readonly placeholder="रेटिंग चुनकर जेनरेट करें..."></textarea><br>
+        <button class="copy" onclick="copyReview()" style="display:none;" id="copy-btn">कॉपी करें</button><br>
+        <a href="#" target="_blank" class="btn post" style="display:none;" id="post-btn">Google पर पोस्ट करें</a>
+        <p><small id="instruction">रिव्यू कॉपी करके Google पेज पर पेस्ट कर दें – 5 सेकंड का काम! ❤️</small></p>
     </div>
     <script>
-        // रैंडमली हिंदी या इंग्लिश चुनता है
-        const language = Math.random() < 0.5 ? 'hindi' : 'english';
+        let selectedRating = 5; // डिफॉल्ट 5
+
+        function selectStar(rating) {
+            selectedRating = rating;
+            document.getElementById('selected-rating').textContent = rating;
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                star.classList.toggle('selected', index < rating);
+            });
+        }
+
         async function generateReview() {
+            const language = Math.random() < 0.5 ? 'hindi' : 'english';
             try {
                 const res = await fetch('/api/generate-review', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ rating: 5, language: language })
+                    body: JSON.stringify({ rating: selectedRating, language: language })
                 });
                 const data = await res.json();
                 document.getElementById('review-text').value = data.review;
+                document.getElementById('copy-btn').style.display = 'inline-block';
+                document.getElementById('post-btn').style.display = 'inline-block';
+                document.getElementById('post-btn').href = `https://g.page/r/CQASqQgR4RvOEBE/review?rating=${selectedRating}`;
+                document.getElementById('instruction').textContent = `रिव्यू कॉपी करके Google पेज पर पेस्ट कर दें – 5 सेकंड का काम! ❤️`;
             } catch {
-                // fallback
                 const fallback = language === 'english'
-                    ? "Amazing experience at Vijay Jewellers! Pure gold, latest designs, very helpful staff and reasonable prices. Highly recommended!"
-                    : "विजय ज्वैलर्स में शानदार अनुभव रहा! शुद्ध सोना, नए डिज़ाइन, स्टाफ बहुत मददगार और कीमत भी उचित। बेस्ट ज्वैलरी शॉप!";
+                    ? `Great experience at Vijay Jewellers! ${selectedRating} stars for quality and service.`
+                    : `विजय ज्वैलर्स में अच्छा अनुभव! ${selectedRating} स्टार क्वालिटी और सर्विस के लिए।`;
                 document.getElementById('review-text').value = fallback;
+                document.getElementById('copy-btn').style.display = 'inline-block';
+                document.getElementById('post-btn').style.display = 'inline-block';
+                document.getElementById('post-btn').href = `https://g.page/r/CQASqQgR4RvOEBE/review?rating=${selectedRating}`;
             }
         }
+
         function copyReview() {
             const t = document.getElementById('review-text');
-            t.select();
             navigator.clipboard.writeText(t.value).then(() => {
                 alert('रिव्यू कॉपी हो गया!');
             }).catch(() => {
                 alert('कॉपी नहीं हुआ, मैन्युअली कॉपी कर लें।');
             });
         }
-        window.onload = generateReview;
     </script>
 </body>
 </html>
