@@ -1,18 +1,13 @@
 {
-  "name": "vijay-jewellers-review",
+  "name": "vijay-review-system",
   "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "start": "node server/server.js",
-    "dev": "nodemon server/server.js"
-  },
+  "main": "server.js",
   "dependencies": {
-    "body-parser": "^1.20.2",
-    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "node-fetch": "^3.3.2"
+    "body-parser": "^1.20.2",
+    "openai": "^4.0.0"
   },
-  "devDependencies": {
-    "nodemon": "^2.0.22"
+  "scripts": {
+    "start": "node server.js"
   }
 }
