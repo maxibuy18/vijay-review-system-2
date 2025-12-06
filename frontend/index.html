@@ -32,8 +32,8 @@
         <button class="generate" onclick="generateReview()">रिव्यू जेनरेट करें</button><br>
         <textarea id="review-text" readonly placeholder="रेटिंग चुनकर जेनरेट करें..."></textarea><br>
         <button class="copy" onclick="copyReview()" style="display:none;" id="copy-btn">कॉपी करें</button><br>
-        <a href="#" target="_blank" class="btn post" style="display:none;" id="post-btn">Google पर पोस्ट करें</a>
-        <p><small id="instruction">रिव्यू कॉपी करके Google पेज पर पेस्ट कर दें – 5 सेकंड का काम! ❤️</small></p>
+        <button class="post" onclick="postToGoogle()" style="display:none;" id="post-btn">Google पर पोस्ट करें</button>
+        <p><small id="instruction">रिव्यू जेनरेट करने के बाद कॉपी करके Google पेज पर पेस्ट कर दें – 5 सेकंड का काम! ❤️</small></p>
     </div>
     <script>
         let selectedRating = 5; // डिफॉल्ट 5
@@ -59,8 +59,7 @@
                 document.getElementById('review-text').value = data.review;
                 document.getElementById('copy-btn').style.display = 'inline-block';
                 document.getElementById('post-btn').style.display = 'inline-block';
-                document.getElementById('post-btn').href = `https://g.page/r/CQASqQgR4RvOEBE/review?rating=${selectedRating}`;
-                document.getElementById('instruction').textContent = `रिव्यू कॉपी करके Google पेज पर पेस्ट कर दें – 5 सेकंड का काम! ❤️`;
+                document.getElementById('instruction').textContent = 'रिव्यू तैयार है! कॉपी करके Google पर पेस्ट करें।';
             } catch {
                 const fallback = language === 'english'
                     ? `Great experience at Vijay Jewellers! ${selectedRating} stars for quality and service.`
@@ -68,7 +67,7 @@
                 document.getElementById('review-text').value = fallback;
                 document.getElementById('copy-btn').style.display = 'inline-block';
                 document.getElementById('post-btn').style.display = 'inline-block';
-                document.getElementById('post-btn').href = `https://g.page/r/CQASqQgR4RvOEBE/review?rating=${selectedRating}`;
+                document.getElementById('instruction').textContent = 'रिव्यू तैयार है! कॉपी करके Google पर पेस्ट करें।';
             }
         }
 
@@ -79,6 +78,17 @@
             }).catch(() => {
                 alert('कॉपी नहीं हुआ, मैन्युअली कॉपी कर लें।');
             });
+        }
+
+        function postToGoogle() {
+            // पहले रिव्यू कॉपी कर लो
+            copyReview();
+            // फिर Google पेज खोलो
+            window.open('https://g.page/r/CQASqQgR4RvOEBE/review', '_blank');
+            // अलर्ट से रिमाइंड करो पेस्ट करने का
+            setTimeout(() => {
+                alert('Google पेज खुल गया! रिव्यू बॉक्स में पेस्ट करें (Ctrl+V या लॉन्ग प्रेस)।');
+            }, 500);
         }
     </script>
 </body>
