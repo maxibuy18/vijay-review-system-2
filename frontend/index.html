@@ -1,57 +1,52 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vijay Jewellers Review</title>
     <style>
-        body {font-family: system-ui; text-align: center; background: #f8f9fa; padding: 4px; margin: 0; box-sizing: border-box;}
-        .box {max-width: 600px; margin: auto; background: white; padding: 12px; border-radius: 6px; box-shadow: 0 1px 4px #00000020;}
-        textarea {width: 100%; height: 150px; padding: 8px; font-size: 16px; border: 1px solid #ddd; border-radius: 4px; margin: 6px 0; resize: vertical; box-sizing: border-box;}
-        button {margin: 4px 0; padding: 8px 16px; font-size: 16px; border: none; border-radius: 4px; cursor: pointer; color: white; width: 100%; box-sizing: border-box;}
-        .generate {background: #ff9800; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px;}
-        .generate-icon {font-size: 16px; cursor: pointer; transition: transform 0.2s;}
+        body {font-family: system-ui; text-align: center; background: #f8f9fa; padding: 8px; margin: 0; box-sizing: border-box;}
+        .box {max-width: 600px; margin: auto; background: white; padding: 16px; border-radius: 8px; box-shadow: 0 2px 8px #00000020;}
+        textarea {width: 100%; height: 150px; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 6px; margin: 8px 0; resize: vertical; box-sizing: border-box;}
+        button {margin: 4px 0; padding: 10px; font-size: 16px; border: none; border-radius: 6px; cursor: pointer; color: white; width: 100%; box-sizing: border-box;}
+        .generate {background: #ff9800; display: flex; align-items: center; justify-content: center; gap: 8px;}
+        .generate-icon {font-size: 18px; cursor: pointer; transition: transform 0.2s;}
         .generate-icon:hover {transform: rotate(180deg);}
         .copy {background: #4285f4;}
-        .post {background: #34a853; font-size: 16px; padding: 10px;}
-        #instruction {font-size: 12px; color: #666; margin-top: 6px; line-height: 1.3;}
-        h1 {font-size: 18px; margin-bottom: 6px;}
-        p {font-size: 13px; margin-bottom: 4px;}
+        .post {background: #34a853; font-size: 17px;}
+        #instruction {font-size: 13px; color: #666; margin-top: 8px; line-height: 1.4;}
         /* PC/लैपटॉप (large screen) */
         @media (min-width: 768px) {
             body {padding: 20px;}
-            .box {padding: 20px; max-width: 500px; border-radius: 8px; box-shadow: 0 2px 8px #00000020;}
-            textarea {height: 160px; font-size: 16px; padding: 10px; border-radius: 6px;}
-            button {width: auto; padding: 10px 20px; font-size: 16px; margin: 6px;}
-            .post {width: 80%; margin: 6px auto; display: block;}
+            .box {padding: 24px; max-width: 500px; border-radius: 12px;}
+            textarea {height: 160px; font-size: 16px; padding: 12px;}
+            button {width: 100%; padding: 12px; font-size: 16px; margin: 4px 0;}
+            .post {width: 100%; padding: 12px; font-size: 17px;}
             #instruction {font-size: 14px;}
-            h1 {font-size: 24px;}
-            p {font-size: 15px;}
+            h1 {font-size: 24px; margin-bottom: 8px;}
         }
         /* टैबलेट (medium screen) */
         @media (min-width: 481px) and (max-width: 767px) {
-            .box {padding: 16px; max-width: 95%;}
-            textarea {height: 140px; padding: 9px;}
-            button {padding: 9px 18px; font-size: 15px;}
-            .post {width: 90%; padding: 9px;}
+            .box {padding: 20px; max-width: 95%;}
+            textarea {height: 140px;}
+            button {padding: 11px; font-size: 16px;}
+            .post {padding: 11px;}
         }
-        /* मोबाइल (small screen) – Google जैसा ultra-compact */
+        /* मोबाइल (small screen) – Google जैसा compact */
         @media (max-width: 480px) {
-            body {padding: 2px;}
-            .box {padding: 10px; margin: 2px; border-radius: 4px; box-shadow: 0 0.5px 2px #00000015;}
-            textarea {height: 70px; font-size: 13px; padding: 6px; margin: 4px 0; border-radius: 3px; line-height: 1.3;}
-            button {margin: 2px 0; padding: 6px 12px; font-size: 13px;}
-            .post {width: 100%; padding: 8px; font-size: 14px; margin: 4px 0;}
-            #instruction {font-size: 11px; margin-top: 4px; padding: 0 2px;}
-            h1 {font-size: 16px; margin-bottom: 4px;}
-            p {font-size: 12px; margin-bottom: 2px;}
+            body {padding: 4px;}
+            .box {padding: 12px; margin: 4px; border-radius: 6px; box-shadow: 0 1px 4px #00000020;}
+            textarea {height: 100px; font-size: 14px; padding: 8px; margin: 6px 0; border-radius: 4px;}
+            button {margin: 2px 0; padding: 8px; font-size: 14px;}
+            .post {width: 100%; padding: 10px; font-size: 15px; margin: 4px 0;}
+            #instruction {font-size: 12px; margin-top: 6px; padding: 0 4px;}
+            h1 {font-size: 18px; margin-bottom: 6px;}
         }
     </style>
 </head>
 <body>
     <div class="box">
-        <h1>विजय ज्वैलर्स को रिव्यू दें</h1>
-        <p>NFC टैग स्कैन करके आप यहाँ पहुँचे! रिव्यू तैयार करने के लिए आइकन क्लिक करें।</p>
+        <h1>Vijay Jewellers Review</h1>
         <button class="generate" id="generate-btn">
             <span class="generate-icon" onclick="generateReview()">🔄</span>
             Review Generate
