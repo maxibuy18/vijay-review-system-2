@@ -44,7 +44,7 @@ app.post('/api/generate-review', async (req, res) => {
 
   const finalPrompt = basePrompt
     .replace(/{product}/g, randomProduct)
-    + `\n\nMANDATORY: Write in ONLY ${language === 'english' ? 'English' : 'Hindi/Hinglish'}. Never mix languages. Make this review 100% unique. Never repeat anything from previous reviews. Return ONLY one review.`;
+    + `\n\nMANDATORY: Return ONLY one complete review. Never split with --- or quotes. Write in ONLY ${language === 'english' ? 'English' : 'Hindi/Hinglish'}. Never mix languages. Make it 100% unique every time.`;
 
   try {
     const completion = await client.chat.completions.create({
@@ -59,35 +59,41 @@ app.post('/api/generate-review', async (req, res) => {
 
     let reviewText = completion.choices[0].message.content.trim();
 
-    // फिक्स 1: अगर --- से दो रिव्यू आए तो सिर्फ पहला लो
+    // 1. दो रिव्यू हो तो सिर्फ पहला लो
     if (reviewText.includes('---')) {
       reviewText = reviewText.split('---')[0].trim();
     }
 
-    // फिक्स 2: अगर बहुत लंबा हो तो काट दो
+    // 2. अंत वाला पैराग्राफ अगर कटा हो तो पूरा हटा दो
+    if (reviewText.includes('"विजय ज्वैलर्स में हाल ही में') || reviewText.includes('"My recent shopping experience')) {
+      const hindiCut = reviewText.split('"विजय ज्वैलर्स में हाल ही में')[0];
+      const engCut = reviewText.split('"My recent shopping experience')[0];
+      reviewText = hindiCut.length > engCut.length ? hindiCut : engCut;
+      reviewText = reviewText.trim();
+    }
+
+    // 3. आखिरी कोट्स/अधूरा वाक्य हटाओ
+    reviewText = reviewText.replace(/"[^"]*$/g, '').trim();
+
+    // 4. लंबाई कंट्रोल (90 शब्द तक)
     const words = reviewText.split(/\s+/);
     if (words.length > 95) {
-      reviewText = words.slice(0, 90).join(' ') + '...';
+      reviewText = words.slice(0, 90).join(' ') + '।';
     }
 
-    // फिक्स 3: आखिर में रेटिंग/तारीख हटाओ
-    reviewText = reviewText.replace(/\b(5[\s]*स्टार|5[\s]*star|⭐|★).*$/gi, '').trim();
-
-    // फिक्स 4: अगर गलती से मिक्स भाषा हो तो साफ करो
-    if (language === 'english') {
-      reviewText = reviewText.replace(/[ऀ-ॿ]/g, '');
-    }
+    // 5. आखिरी सफाई
+    reviewText = reviewText.replace(/\s+$/, '');
 
     res.json({ review: reviewText });
 
   } catch (error) {
     console.error(error);
     const ending = language === 'english'
-      ? "My recent shopping experience at Vijay Jewellers was truly amazing. The jewelry I bought has top-notch quality. The designs are unique and attractive. Prices are very reasonable, making it even more special. The staff's behavior was excellent, all very helpful and polite. I loved how they attended to all my needs. Overall, it was a great experience and I'll definitely come back for more shopping."
-      : "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा। मैंने जो ज्वेलरी खरीदी है, उसकी गुणवत्ता तो वाकई में शीर्ष वर्ग की है। डिजाइन भी बेहद अनोखे और आकर्षक हैं। कीमतें भी बहुत उचित हैं, जो इसे और भी खास बनाती हैं। स्टाफ का व्यवहार तो एकदम बेहतरीन था, सभी लोग बहुत मददगार और विनम्र थे। मुझे बहुत अच्छा लगा कि उन्होंने मेरी सभी जरूरतों का ध्यान रखा। कुल मिलाकर, यह एक बेहतरीन अनुभव रहा और मैं जरूर यहाँ फिर से खरीदारी करने आऊँगा।";
+      ? "My recent shopping experience at Vijay Jewellers was truly amazing..."
+      : "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा...";
 
     const fallback = language === 'english'
-      ? `Outstanding service at Vijay Jewellers! The ${randomProduct} was perfect. Highly recommend this place! ${ending}`
+      ? `Outstanding service at Vijay Jewellers! The ${randomProduct} was perfect. Highly recommend! ${ending}`
       : `विजय ज्वैलर्स में ${randomProduct} देखते ही पसंद आ गया। क्वालिटी शानदार, स्टाफ बहुत अच्छा। जरूर आएं! ${ending}`;
 
     res.json({ review: fallback });
