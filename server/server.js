@@ -21,13 +21,11 @@ const PRODUCTS_FEATURES = [
   'old jewellery repair (broken pieces fixing)'
 ];
 
-// शुद्ध हिन्दी प्रॉम्प्ट्स
 const HINDI_PROMPTS = [
   `विजय ज्वैलर्स के लिए 65-85 शब्दों में एकदम नया और अलग 5 स्टार रिव्यू लिखो। {product} का जरूर जिक्र करो। सोने की शुद्धता, नए डिजाइन, मददगार स्टाफ, उचित कीमत और पुरानी ज्वेलरी की मरम्मत का भी उल्लेख करो। अंत में ये पैराग्राफ बिल्कुल वैसा ही डालो: "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा। मैंने जो ज्वेलरी खरीदी है, उसकी गुणवत्ता तो वाकई में शीर्ष वर्ग की है। डिजाइन भी बेहद अनोखे और आकर्षक हैं। कीमतें भी बहुत उचित हैं, जो इसे और भी खास बनाती हैं। स्टाफ का व्यवहार तो एकदम बेहतरीन था, सभी लोग बहुत मददगार और विनम्र थे। मुझे बहुत अच्छा लगा कि उन्होंने मेरी सभी जरूरतों का ध्यान रखा। कुल मिलाकर, यह एक बेहतरीन अनुभव रहा और मैं जरूर यहाँ फिर से खरीदारी करने आऊँगा।" सिर्फ हिन्दी में लिखो, कोई इंग्लिश शब्द न आए। हर बार बिल्कुल अलग लिखो।`,
   `एक खुश ग्राहक की तरह विजय ज्वैलर्स का रिव्यू लिखो। {product} खरीदा या मरम्मत करवाई, क्वालिटी कमाल की थी, स्टाफ ने बहुत अच्छे से गाइड किया। कार्ड से पेमेंट भी आसान था। अंत में ऊपर वाला पूरा पैराग्राफ वैरिएट करके डालो। सिर्फ हिन्दी में, बिल्कुल नया लिखो।`
 ];
 
-// शुद्ध इंग्लिश प्रॉम्प्ट्स
 const ENGLISH_PROMPTS = [
   `Write a completely new and different 5-star review for Vijay Jewellers in 65-85 words. Must mention {product}, gold purity (18k/22k hallmark), unique designs, excellent staff, reasonable prices and old jewellery repair service. End exactly with this paragraph: "My recent shopping experience at Vijay Jewellers was truly amazing. The jewelry I bought has top-notch quality. The designs are unique and attractive. Prices are very reasonable, making it even more special. The staff's behavior was excellent, all very helpful and polite. I loved how they attended to all my needs. Overall, it was a great experience and I'll definitely come back for more shopping." Write in pure English only. Never repeat any previous review.`,
   `Write a fresh 5-star review as a happy customer – bought or repaired {product}, amazing collection, trustworthy hallmark, staff guided perfectly, smooth card payment. End with the above paragraph. Pure English only, completely unique every time.`
@@ -46,24 +44,38 @@ app.post('/api/generate-review', async (req, res) => {
 
   const finalPrompt = basePrompt
     .replace(/{product}/g, randomProduct)
-    + `\n\nMANDATORY: Write in ONLY ${language === 'english' ? 'English' : 'Hindi/Hinglish'}. Never mix languages. Make this review 100% unique. Never repeat anything from previous reviews.`;
+    + `\n\nMANDATORY: Write in ONLY ${language === 'english' ? 'English' : 'Hindi/Hinglish'}. Never mix languages. Make this review 100% unique. Never repeat anything from previous reviews. Return ONLY one review.`;
 
   try {
     const completion = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: finalPrompt }],
       max_tokens: 300,
-      temperature: 0.98,           // ज्यादा वैरिएशन
-      presence_penalty: 1.0,        // पुरानी बातें बिल्कुल न आएं
-      frequency_penalty: 1.0,       // एक ही शब्द बार-बार न आए
+      temperature: 0.98,
+      presence_penalty: 1.0,
+      frequency_penalty: 1.0,
       top_p: 0.95
     });
 
     let reviewText = completion.choices[0].message.content.trim();
 
-    // अगर गलती से मिक्स हो गया तो साफ कर दो
+    // फिक्स 1: अगर --- से दो रिव्यू आए तो सिर्फ पहला लो
+    if (reviewText.includes('---')) {
+      reviewText = reviewText.split('---')[0].trim();
+    }
+
+    // फिक्स 2: अगर बहुत लंबा हो तो काट दो
+    const words = reviewText.split(/\s+/);
+    if (words.length > 95) {
+      reviewText = words.slice(0, 90).join(' ') + '...';
+    }
+
+    // फिक्स 3: आखिर में रेटिंग/तारीख हटाओ
+    reviewText = reviewText.replace(/\b(5[\s]*स्टार|5[\s]*star|⭐|★).*$/gi, '').trim();
+
+    // फिक्स 4: अगर गलती से मिक्स भाषा हो तो साफ करो
     if (language === 'english') {
-      reviewText = reviewText.replace(/[ऀ-ॿ]/g, ''); // हिन्दी कैरेक्टर हटा दो
+      reviewText = reviewText.replace(/[ऀ-ॿ]/g, '');
     }
 
     res.json({ review: reviewText });
