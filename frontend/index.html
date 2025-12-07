@@ -49,7 +49,7 @@
     <script>
         async function generateReview() {
             document.getElementById('refresh-icon').classList.add('spinning');
-            const language = Math.random() < 0.5 ? 'hindi' : 'english';
+          const language = Date.now() % 2 === 0 ? 'hindi' : 'english';
             try {
                 const res = await fetch('/api/generate-review', {
                     method: 'POST',
