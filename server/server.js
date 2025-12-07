@@ -9,11 +9,8 @@ const client = new openai.OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// सही Google Review URL with 5-star pre-filled (2025 format)
 const PLACE_ID = 'CQASqQgR4RvOEBE';
-const GOOGLE_REVIEW_URL = `https://g.page/r/${PLACE_ID}/review?rating=5`;
 
-// Products/Features to mention randomly (old jewellery repair ऐड किया)
 const PRODUCTS_FEATURES = [
   '18k hallmark gold necklace',
   'silver payal',
@@ -21,63 +18,61 @@ const PRODUCTS_FEATURES = [
   '92.5 silver Vaigrah articles',
   '22k gold rings',
   'card payment via swipe machine',
-  'old jewellery repair (broken pieces fixing)'  // नया ऐड किया
+  'old jewellery repair (broken pieces fixing)'
 ];
 
-// Prompts for Hindi/Hinglish (with placeholder {product} + ending structure)
+// हिंदी और इंग्लिश प्रॉम्प्ट्स अलग-अलग रखे – हर बार नया वैरिएशन
 const HINDI_PROMPTS = [
-  `विजय ज्वैलर्स के लिए 60-80 शब्दों का ईमानदार 5 स्टार रिव्यू लिखो। {product} का जिक्र करो, सोने की शुद्धता (18k hallmark या 22k gold), चांदी की 92.5 purity, सहायक स्टाफ, स्वाइप मशीन से आसान कार्ड पेमेंट या पुरानी ज्वेलरी की मरम्मत का उल्लेख। अंत में ये स्ट्रक्चर यूज करो: "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा। मैंने जो ज्वेलरी खरीदी है, उसकी गुणवत्ता तो वाकई में शीर्ष वर्ग की है। डिजाइन भी बेहद अनोखे और आकर्षक हैं। कीमतें भी बहुत उचित हैं, जो इसे और भी खास बनाती हैं। स्टाफ का व्यवहार तो एकदम बेहतरीन था, सभी लोग बहुत मददगार और विनम्र थे। मुझे बहुत अच्छा लगा कि उन्होंने मेरी सभी जरूरतों का ध्यान रखा। कुल मिलाकर, यह एक बेहतरीन अनुभव रहा और मैं जरूर यहाँ फिर से खरीदारी करने आऊँगा।" हिंदी-अंग्रेजी मिश्रण, प्राकृतिक टोन।`,
-  `एक खुश ग्राहक की तरह विजय ज्वैलर्स का रिव्यू लिखो – {product} खरीदा या मरम्मत करवाई, अद्भुत संग्रह (silver payal या chain), भरोसेमंद hallmark, स्टाफ ने बहुत अच्छे से मार्गदर्शन किया, card payment smooth। 70 शब्द, कैजुअल भाषा। अंत में ऊपर वाला स्ट्रक्चर वैरिएट करके ऐड करो।`,
-  `विजय ज्वैलर्स में शानदार खरीदारी अनुभव रहा। {product} की क्वालिटी टॉप (92.5 silver या 22k gold), डिजाइन अनोखे, swipe machine से पेमेंट आसान या पुरानी ज्वेलरी की फिक्सिंग। स्टाफ का व्यवहार बहुत अच्छा। हिंदी में लिखो। अंत में दिया स्ट्रक्चर यूज करो।`
+  `विजय ज्वैलर्स के लिए 65-85 शब्दों का एकदम नया और अलग 5 स्टार रिव्यू लिखो। {product} का जिक्र जरूर करो। सोने की शुद्धता, डिजाइन, स्टाफ का व्यवहार, कीमत और पुरानी ज्वेलरी की मरम्मत का भी उल्लेख करो। अंत में ये स्ट्रक्चर यूज करो: "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा। मैंने जो ज्वेलरी खरीदी है, उसकी गुणवत्ता तो वाकई में शीर्ष वर्ग की है। डिजाइन भी बेहद अनोखे और आकर्षक हैं। कीमतें भी बहुत उचित हैं, जो इसे और भी खास बनाती हैं। स्टाफ का व्यवहार तो एकदम बेहतरीन था, सभी लोग बहुत मददगार और विनम्र थे। मुझे बहुत अच्छा लगा कि उन्होंने मेरी सभी जरूरतों का ध्यान रखा। कुल मिलाकर, यह एक बेहतरीन अनुभव रहा और मैं जरूर यहाँ फिर से खरीदारी करने आऊँगा।" हर बार बिल्कुल अलग लिखो, पहले वाला कॉपी मत करो।`,
+  `एक खुश ग्राहक की तरह विजय ज्वैलर्स का रिव्यू लिखो। {product} खरीदा या मरम्मत करवाई, क्वालिटी कमाल की, स्टाफ ने बहुत अच्छे से गाइड किया। कार्ड पेमेंट भी आसान था। अंत में ऊपर वाला पैराग्राफ वैरिएट करके डालो। बिल्कुल नया लिखो।`
 ];
 
-// Prompts for English (with placeholder {product} + ending structure)
 const ENGLISH_PROMPTS = [
-  `Write a genuine 5-star review for Vijay Jewellers in 60-80 words. Mention {product}, gold purity (18k hallmark or 22k gold), 92.5 silver Vaigrah, helpful staff, easy card payment via swipe machine or old jewellery repair, and reasonable prices. End with this structure: "My recent shopping experience at Vijay Jewellers was truly amazing. The jewelry I bought has top-notch quality. The designs are unique and attractive. Prices are very reasonable, making it even more special. The staff's behavior was excellent, all very helpful and polite. I loved how they attended to all my needs. Overall, it was a great experience and I'll definitely come back for more shopping." Natural, casual tone in English.`,
-  `Write a review as a happy customer for Vijay Jewellers – bought or repaired {product}, amazing collection (silver payal or chain), trustworthy hallmark, staff guided perfectly, smooth card payment. 70 words, casual language. End with the above structure variation.`,
-  `Great shopping experience at Vijay Jewellers. Top quality {product} (92.5 silver or 22k gold), unique designs, easy swipe machine payment or broken jewellery fixing. Staff was excellent. Write in English. End with the given structure.`
+  `Write a completely new and different 5-star review for Vijay Jewellers in 65-85 words. Must mention {product}, gold purity (18k/22k hallmark), unique designs, excellent staff, reasonable prices and old jewellery repair service. End exactly with this paragraph: "My recent shopping experience at Vijay Jewellers was truly amazing. The jewelry I bought has top-notch quality. The designs are unique and attractive. Prices are very reasonable, making it even more special. The staff's behavior was excellent, all very helpful and polite. I loved how they attended to all my needs. Overall, it was a great experience and I'll definitely come back for more shopping." Never repeat previous reviews.`,
+  `Write a fresh review as a happy customer – bought/repaired {product}, amazing collection, trustworthy hallmark, staff guided perfectly, smooth card payment. End with the above paragraph variation. Make it unique every time.`
 ];
 
 app.post('/api/generate-review', async (req, res) => {
-  const { rating, visit_when, language = 'hindi' } = req.body; // Default to Hindi
+  const { rating = 5, language = 'hindi' } = req.body;
+
   if (!client.apiKey) {
     return res.status(500).json({ error: 'OpenAI API key is missing' });
   }
-  // Random product/feature mention
+
   const randomProduct = PRODUCTS_FEATURES[Math.floor(Math.random() * PRODUCTS_FEATURES.length)];
   const prompts = language === 'english' ? ENGLISH_PROMPTS : HINDI_PROMPTS;
-  const randomPromptTemplate = prompts[Math.floor(Math.random() * prompts.length)].replace('{product}', randomProduct);
-  let langInstruction = '';
-  if (language === 'english') {
-    langInstruction = 'Write the entire review in natural, casual English only. Make it sound like a real customer, include the product mention naturally. End with the specified structure without adding rating or date at the end.';
-  } else {
-    langInstruction = 'रिव्यू हिंदी या हिंग्लिश में लिखो, प्राकृतिक और असली ग्राहक जैसा लगे। प्रोडक्ट का जिक्र नैचुरली ऐड करो। अंत में दिया स्ट्रक्चर यूज करो, बिना रेटिंग या तारीख के।';
-  }
-  const fullPrompt = `${randomPromptTemplate} Rating: ${rating} stars. Visit when: ${visit_when || 'recently'}. ${langInstruction} Today's date: ${new Date().toLocaleDateString(language === 'english' ? 'en-US' : 'hi-IN')}. Do not include rating stars or date in the review text.`;
+  const basePrompt = prompts[Math.floor(Math.random() * prompts.length)];
+
+  const finalPrompt = basePrompt
+    .replace(/{product}/g, randomProduct)
+    + `\n\nImportant: This must be a completely unique review. Never repeat any previous version. Today's date: ${new Date().toLocaleDateString(language === 'english' ? 'en-US' : 'hi-IN')}`;
+
   try {
     const completion = await client.chat.completions.create({
       model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: fullPrompt }],
-      max_tokens: 250, // बढ़ाया ताकि अंत का स्ट्रक्चर फिट हो
-      temperature: 0.9 // Variety के लिए
+      messages: [{ role: 'user', content: finalPrompt }],
+      max_tokens: 280,
+      temperature: 0.95,  // ज्यादा वैरिएशन
+      presence_penalty: 0.6,
+      frequency_penalty: 0.6
     });
+
     const reviewText = completion.choices[0].message.content.trim();
     res.json({ review: reviewText });
   } catch (error) {
     console.error(error);
-    // Language-specific fallback with product + ending structure
-    const fallbackProduct = randomProduct;
-    const endingStructure = language === 'english'
+    const ending = language === 'english'
       ? "My recent shopping experience at Vijay Jewellers was truly amazing. The jewelry I bought has top-notch quality. The designs are unique and attractive. Prices are very reasonable, making it even more special. The staff's behavior was excellent, all very helpful and polite. I loved how they attended to all my needs. Overall, it was a great experience and I'll definitely come back for more shopping."
       : "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा। मैंने जो ज्वेलरी खरीदी है, उसकी गुणवत्ता तो वाकई में शीर्ष वर्ग की है। डिजाइन भी बेहद अनोखे और आकर्षक हैं। कीमतें भी बहुत उचित हैं, जो इसे और भी खास बनाती हैं। स्टाफ का व्यवहार तो एकदम बेहतरीन था, सभी लोग बहुत मददगार और विनम्र थे। मुझे बहुत अच्छा लगा कि उन्होंने मेरी सभी जरूरतों का ध्यान रखा। कुल मिलाकर, यह एक बेहतरीन अनुभव रहा और मैं जरूर यहाँ फिर से खरीदारी करने आऊँगा।";
+
     const fallback = language === 'english'
-      ? `Loved buying or repairing ${fallbackProduct} at Vijay Jewellers! Pure quality and easy payment. ${endingStructure}`
-      : `विजय ज्वैलर्स से ${fallbackProduct} खरीदना या मरम्मत करवाना शानदार रहा! क्वालिटी कमाल। ${endingStructure}`;
+      ? `Excellent service at Vijay Jewellers! Loved the ${randomProduct}. Pure quality and great staff. ${ending}`
+      : `विजय ज्वैलर्स में ${randomProduct} बहुत पसंद आया। क्वालिटी शानदार और स्टाफ कमाल का। ${ending}`;
+
     res.json({ review: fallback });
   }
 });
 
-// Frontend serve करो (NFC वाला हिस्सा यहीं से चलेगा)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
 });
