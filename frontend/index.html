@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vijay Jewellers Review</title>
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body {font-family: system-ui; text-align: center; background: #f8f9fa; padding: 8px; margin: 0;}
         .box {max-width: 600px; margin: auto; background: white; padding: 16px; border-radius: 8px; box-shadow: 0 2px 8px #00000020;}
@@ -13,8 +11,8 @@
         textarea {width: 100%; height: 150px; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 6px; margin: 8px 0; resize: vertical; box-sizing: border-box;}
         button, .post-link {margin: 6px auto; padding: 10px 24px; font-size: 16px; border: none; border-radius: 6px; cursor: pointer; color: white; display: inline-block; width: 90%; max-width: 320px;}
         .generate {background: #ff9800; display: flex; align-items: center; justify-content: center; gap: 10px;}
-        .generate-icon {font-size: 18px; cursor: pointer;}
-        .generate-icon.spinning {animation: spin 1s linear infinite;}
+        .refresh-svg {width: 22px; height: 22px; fill: white; cursor: pointer;}
+        .refresh-svg.spinning {animation: spin 1s linear infinite;}
         @keyframes spin {from {transform: rotate(0deg);} to {transform: rotate(360deg);}}
         .copy {background: #4285f4;}
         .post-link {background: #34a853; text-decoration: none; text-align: center;}
@@ -36,13 +34,16 @@
     <div class="box">
         <img src="logo.png" alt="Vijay Jewellers" class="logo">
         <button class="generate">
-            <i class="fa-regular fa-arrows-rotate generate-icon" id="refresh-icon" onclick="generateReview()"></i>
+            <!-- आपका दिया हुआ SVG icon यहाँ -->
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="white" class="refresh-svg" id="refresh-icon" onclick="generateReview()">
+                <path d="M204-318q-22-38-33-78t-11-82q0-134 93-228t227-94h7l-64-64 56-56 160 160-160 160-56-56 64-64h-7q-100 0-170 70.5T240-478q0 26 6 51t18 49l-60 60ZM481-40 321-200l160-160 56 56-64 64h7q100 0 170-70.5T720-482q0-26-6-51t-18-49l60-60q22 38 33 78t11 82q0 134-93 228t-227 94h-7l64 64-56 56Z"/>
+            </svg>
             Review Generate
         </button>
         <textarea id="review-text" readonly placeholder="आइकन क्लिक करके रिव्यू जेनरेट करें..."></textarea>
         <button class="copy" onclick="copyReview()" style="display:none;" id="copy-btn">Copy Review</button>
         <a href="https://g.page/r/CQASqQgR4RvOEBE/review" target="_blank" class="post-link" style="display:none;" id="post-link">Google पर पोस्ट करें</a>
-        <p><small id="instruction">रिव्यू जेनरेट करने के बाद कॉपी करके Google पेज पर पेस्ट कर दें – 5 सेकंड का काम! ❤️</small></p>
+        <p><small id="instruction">रिव्यू जेनरेट करने के बाद कॉपी करके Google पेज पर पेस्ट कर दें – 5 सेकंड का काम!</small></p>
     </div>
 
     <script>
