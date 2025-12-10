@@ -21,17 +21,27 @@ const PRODUCTS_FEATURES = [
   'old jewellery repair (broken pieces fixing)'
 ];
 
+const OTHER_JEWELERS = [
+  'तनिष्क़', 'कल्याण', 'पीसी ज्वैलर्स', 'आरा का भारत भूषण भंडार ज्वेलर्स', 'बलिया का डीपी ज्वैलर्स', 
+  'वाराणसी का कन्हैया लाल ज्वेलर्स', 'वाराणसी का नारायण दास ज्वेलर्स', 'पटना का अलंकार ज्वेलर्स', 
+  'पटना का हीरा पन्ना ज्वेलर्स', 'बक्सर के लोकल सौनार', 'डुमराव के सुनार', 'ब्रह्मपुर के ज्वेलर्स', 'गाजीपुर के ज्वेलर्स'
+];
+
+let requestCount = 0; // काउंटर शुरू से 0 – हर रिव्यू पर +1
+
 const HINDI_PROMPTS = [
-  `विजय ज्वैलर्स के लिए 50-70 शब्दों में नया 5 स्टार रिव्यू लिखो। {product} का जिक्र करो। दूसरे ज्वेलर्स (तांसा/दिल्ली/मुंबई/पटना/वाराणसी/कोलकाता/इंदौर/रांची/बलिया) पर चेक किया, exchange पॉलिसी 18/22k पर 100% है। अंत में ये पैराग्राफ डालो: "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा। मैंने जो ज्वेलरी खरीदी है, उसकी गुणवत्ता तो वाकई में शीर्ष वर्ग की है। डिजाइन भी बेहद अनोखे और आकर्षक हैं। कीमतें भी बहुत उचित हैं, जो इसे और भी खास बनाती हैं। स्टाफ का व्यवहार तो एकदम बेहतरीन था, सभी लोग बहुत मददगार और विनम्र थे। मुझे बहुत अच्छा लगा कि उन्होंने मेरी सभी जरूरतों का ध्यान रखा। कुल मिलाकर, यह एक बेहतरीन अनुभव रहा और मैं जरूर यहाँ फिर से खरीदारी करने आऊँगा।" सिर्फ हिन्दी में, हर बार अलग।`,
-  `विजय ज्वैलर्स से {product} लिया, दूसरे सौनार के पास चेक कराया तो 18/22k सही निकला। exchange पॉलिसी कमाल की। अंत में ऊपर वाला पैराग्राफ डालो। सिर्फ हिन्दी में, नया लिखो।`
+  `विजय ज्वैलर्स के लिए 65-85 शब्दों में एकदम नया और अलग 5 स्टार रिव्यू लिखो। {product} का जरूर जिक्र करो। सोने की शुद्धता, नए डिजाइन, मददगार स्टाफ, उचित कीमत और पुरानी ज्वेलरी की मरम्मत का भी उल्लेख करो। ${requestCount > 10 ? '{other_jeweler} पर चेक कराया, 18/22k exchange पॉलिसी 100% सही निकली।' : ''} अंत में ये पैराग्राफ बिल्कुल वैसा ही डालो: "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा। मैंने जो ज्वेलरी खरीदी है, उसकी गुणवत्ता तो वाकई में शीर्ष वर्ग की है। डिजाइन भी बेहद अनोखे और आकर्षक हैं। कीमतें भी बहुत उचित हैं, जो इसे और भी खास बनाती हैं। स्टाफ का व्यवहार तो एकदम बेहतरीन था, सभी लोग बहुत मददगार और विनम्र थे। मुझे बहुत अच्छा लगा कि उन्होंने मेरी सभी जरूरतों का ध्यान रखा। कुल मिलाकर, यह एक बेहतरीन अनुभव रहा और मैं जरूर यहाँ फिर से खरीदारी करने आऊँगा।" सिर्फ हिन्दी में लिखो, कोई इंग्लिश शब्द न आए। हर बार बिल्कुल अलग लिखो।`,
+  `एक खुश ग्राहक की तरह विजय ज्वैलर्स का रिव्यू लिखो। {product} खरीदा या मरम्मत करवाई, क्वालिटी कमाल की थी, स्टाफ ने बहुत अच्छे से गाइड किया। कार्ड से पेमेंट भी आसान था। ${requestCount > 10 ? '{other_jeweler} पर चेक कराया तो 18/22k सही निकला।' : ''} अंत में ऊपर वाला पूरा पैराग्राफ वैरिएट करके डालो। सिर्फ हिन्दी में, बिल्कुल नया लिखो।`
 ];
 
 const ENGLISH_PROMPTS = [
-  `Write 50-70 words new 5-star review for Vijay Jewellers. Mention {product}. Checked at other jewelers (Tansa/Delhi/Mumbai/Patna/Varanasi/Kolkata/Indore/Ranchi/Ballia), 18/22k exchange policy 100%. End with this paragraph: "My recent shopping experience at Vijay Jewellers was truly amazing. The jewelry I bought has top-notch quality. The designs are unique and attractive. Prices are very reasonable, making it even more special. The staff's behavior was excellent, all very helpful and polite. I loved how they attended to all my needs. Overall, it was a great experience and I'll definitely come back for more shopping." Pure English only, unique every time.`,
-  `Bought {product} from Vijay Jewellers, verified at other jeweler – 18/22k correct. Great exchange policy. End with above paragraph. Pure English, fresh.`
+  `Write a completely new and different 5-star review for Vijay Jewellers in 65-85 words. Must mention {product}. ${requestCount > 10 ? 'Checked at other jewelers {other_jeweler}, 18/22k exchange policy 100% confirmed.' : ''} Gold purity (18k/22k hallmark), unique designs, excellent staff, reasonable prices and old jewellery repair service. End exactly with this paragraph: "My recent shopping experience at Vijay Jewellers was truly amazing. The jewelry I bought has top-notch quality. The designs are unique and attractive. Prices are very reasonable, making it even more special. The staff's behavior was excellent, all very helpful and polite. I loved how they attended to all my needs. Overall, it was a great experience and I'll definitely come back for more shopping." Write in pure English only. Never repeat any previous review.`,
+  `Write a fresh 5-star review as a happy customer – bought or repaired {product}, ${requestCount > 10 ? 'verified at {other_jeweler},' : ''} amazing collection, trustworthy hallmark, staff guided perfectly, smooth card payment. End with the above paragraph. Pure English only, completely unique every time.`
 ];
 
 app.post('/api/generate-review', async (req, res) => {
+  requestCount++; // हर request पर काउंटर बढ़ाओ
+
   const { rating = 5, language = 'hindi' } = req.body;
 
   if (!client.apiKey) {
@@ -39,18 +49,20 @@ app.post('/api/generate-review', async (req, res) => {
   }
 
   const randomProduct = PRODUCTS_FEATURES[Math.floor(Math.random() * PRODUCTS_FEATURES.length)];
+  const randomOtherJeweler = OTHER_JEWELERS[Math.floor(Math.random() * OTHER_JEWELERS.length)];
   const prompts = language === 'english' ? ENGLISH_PROMPTS : HINDI_PROMPTS;
   const basePrompt = prompts[Math.floor(Math.random() * prompts.length)];
 
   const finalPrompt = basePrompt
     .replace(/{product}/g, randomProduct)
+    .replace(/{other_jeweler}/g, randomOtherJeweler)
     + `\n\nMANDATORY: Return ONLY one complete review. Never split with --- or quotes. Write in ONLY ${language === 'english' ? 'English' : 'Hindi/Hinglish'}. Never mix languages. Make it 100% unique every time.`;
 
   try {
     const completion = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: finalPrompt }],
-      max_tokens: 250,
+      max_tokens: 300,
       temperature: 0.98,
       presence_penalty: 1.0,
       frequency_penalty: 1.0,
