@@ -22,13 +22,13 @@ const PRODUCTS_FEATURES = [
 ];
 
 const HINDI_PROMPTS = [
-  `विजय ज्वैलर्स के लिए 65-85 शब्दों में एकदम नया और अलग 5 स्टार रिव्यू लिखो। {product} का जरूर जिक्र करो। सोने की शुद्धता, नए डिजाइन, मददगार स्टाफ, उचित कीमत और पुरानी ज्वेलरी की मरम्मत का भी उल्लेख करो। अंत में ये पैराग्राफ बिल्कुल वैसा ही डालो: "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा। मैंने जो ज्वेलरी खरीदी है, उसकी गुणवत्ता तो वाकई में शीर्ष वर्ग की है। डिजाइन भी बेहद अनोखे और आकर्षक हैं। कीमतें भी बहुत उचित हैं, जो इसे और भी खास बनाती हैं। स्टाफ का व्यवहार तो एकदम बेहतरीन था, सभी लोग बहुत मददगार और विनम्र थे। मुझे बहुत अच्छा लगा कि उन्होंने मेरी सभी जरूरतों का ध्यान रखा। कुल मिलाकर, यह एक बेहतरीन अनुभव रहा और मैं जरूर यहाँ फिर से खरीदारी करने आऊँगा।" सिर्फ हिन्दी में लिखो, कोई इंग्लिश शब्द न आए। हर बार बिल्कुल अलग लिखो।`,
-  `एक खुश ग्राहक की तरह विजय ज्वैलर्स का रिव्यू लिखो। {product} खरीदा या मरम्मत करवाई, क्वालिटी कमाल की थी, स्टाफ ने बहुत अच्छे से गाइड किया। कार्ड से पेमेंट भी आसान था। अंत में ऊपर वाला पूरा पैराग्राफ वैरिएट करके डालो। सिर्फ हिन्दी में, बिल्कुल नया लिखो।`
+  `विजय ज्वैलर्स के लिए 50-70 शब्दों में नया 5 स्टार रिव्यू लिखो। {product} का जिक्र करो। दूसरे ज्वेलर्स (तांसा/दिल्ली/मुंबई/पटना/वाराणसी/कोलकाता/इंदौर/रांची/बलिया) पर चेक किया, exchange पॉलिसी 18/22k पर 100% है। अंत में ये पैराग्राफ डालो: "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा। मैंने जो ज्वेलरी खरीदी है, उसकी गुणवत्ता तो वाकई में शीर्ष वर्ग की है। डिजाइन भी बेहद अनोखे और आकर्षक हैं। कीमतें भी बहुत उचित हैं, जो इसे और भी खास बनाती हैं। स्टाफ का व्यवहार तो एकदम बेहतरीन था, सभी लोग बहुत मददगार और विनम्र थे। मुझे बहुत अच्छा लगा कि उन्होंने मेरी सभी जरूरतों का ध्यान रखा। कुल मिलाकर, यह एक बेहतरीन अनुभव रहा और मैं जरूर यहाँ फिर से खरीदारी करने आऊँगा।" सिर्फ हिन्दी में, हर बार अलग।`,
+  `विजय ज्वैलर्स से {product} लिया, दूसरे सौनार के पास चेक कराया तो 18/22k सही निकला। exchange पॉलिसी कमाल की। अंत में ऊपर वाला पैराग्राफ डालो। सिर्फ हिन्दी में, नया लिखो।`
 ];
 
 const ENGLISH_PROMPTS = [
-  `Write a completely new and different 5-star review for Vijay Jewellers in 65-85 words. Must mention {product}, gold purity (18k/22k hallmark), unique designs, excellent staff, reasonable prices and old jewellery repair service. End exactly with this paragraph: "My recent shopping experience at Vijay Jewellers was truly amazing. The jewelry I bought has top-notch quality. The designs are unique and attractive. Prices are very reasonable, making it even more special. The staff's behavior was excellent, all very helpful and polite. I loved how they attended to all my needs. Overall, it was a great experience and I'll definitely come back for more shopping." Write in pure English only. Never repeat any previous review.`,
-  `Write a fresh 5-star review as a happy customer – bought or repaired {product}, amazing collection, trustworthy hallmark, staff guided perfectly, smooth card payment. End with the above paragraph. Pure English only, completely unique every time.`
+  `Write 50-70 words new 5-star review for Vijay Jewellers. Mention {product}. Checked at other jewelers (Tansa/Delhi/Mumbai/Patna/Varanasi/Kolkata/Indore/Ranchi/Ballia), 18/22k exchange policy 100%. End with this paragraph: "My recent shopping experience at Vijay Jewellers was truly amazing. The jewelry I bought has top-notch quality. The designs are unique and attractive. Prices are very reasonable, making it even more special. The staff's behavior was excellent, all very helpful and polite. I loved how they attended to all my needs. Overall, it was a great experience and I'll definitely come back for more shopping." Pure English only, unique every time.`,
+  `Bought {product} from Vijay Jewellers, verified at other jeweler – 18/22k correct. Great exchange policy. End with above paragraph. Pure English, fresh.`
 ];
 
 app.post('/api/generate-review', async (req, res) => {
@@ -50,7 +50,7 @@ app.post('/api/generate-review', async (req, res) => {
     const completion = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: finalPrompt }],
-      max_tokens: 300,
+      max_tokens: 250,
       temperature: 0.98,
       presence_penalty: 1.0,
       frequency_penalty: 1.0,
@@ -64,25 +64,10 @@ app.post('/api/generate-review', async (req, res) => {
       reviewText = reviewText.split('---')[0].trim();
     }
 
-    // 2. अंत वाला पूरा पैराग्राफ जोड़ दो अगर कटा हो
-    const HINDI_FULL_END = "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा। मैंने जो ज्वेलरी खरीदी है, उसकी गुणवत्ता तो वाकई में शीर्ष वर्ग की है। डिजाइन भी बेहद अनोखे और आकर्षक हैं। कीमतें भी बहुत उचित हैं, जो इसे और भी खास बनाती हैं। स्टाफ का व्यवहार तो एकदम बेहतरीन था, सभी लोग बहुत मददगार और विनम्र थे। मुझे बहुत अच्छा लगा कि उन्होंने मेरी सभी जरूरतों का ध्यान रखा। कुल मिलाकर, यह एक बेहतरीन अनुभव रहा और मैं जरूर यहाँ फिर से खरीदारी करने आऊँगा।";
-    const ENGLISH_FULL_END = "My recent shopping experience at Vijay Jewellers was truly amazing. The jewelry I bought has top-notch quality. The designs are unique and attractive. Prices are very reasonable, making it even more special. The staff's behavior was excellent, all very helpful and polite. I loved how they attended to all my needs. Overall, it was a great experience and I'll definitely come back for more shopping.";
-
-    const FULL_END = language === 'english' ? ENGLISH_FULL_END : HINDI_FULL_END;
-
-    // अगर अंत वाला पैराग्राफ शुरू हुआ है लेकिन पूरा नहीं है तो पूरा जोड़ दो
-    const endStartHi = "विजय ज्वैलर्स में हाल ही में";
-    const endStartEn = "My recent shopping experience";
-
-    if ((language === 'hindi' && reviewText.includes(endStartHi) && !reviewText.includes('फिर से खरीदारी करने आऊँगा')) ||
-        (language === 'english' && reviewText.includes(endStartEn) && !reviewText.includes("I'll definitely come back"))) {
-      
-      // कटा हुआ हिस्सा हटाकर पूरा पैराग्राफ जोड़ दो
-      if (language === 'hindi') {
-        reviewText = reviewText.split(endStartHi)[0].trim() + " " + HINDI_FULL_END;
-      } else {
-        reviewText = reviewText.split(endStartEn)[0].trim() + " " + ENGLISH_FULL_END;
-      }
+    // 2. लंबाई कंट्रोल (70 शब्द तक)
+    const words = reviewText.split(/\s+/);
+    if (words.length > 75) {
+      reviewText = words.slice(0, 70).join(' ') + '.';
     }
 
     // 3. आखिरी सफाई
@@ -92,10 +77,13 @@ app.post('/api/generate-review', async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    const FULL_END = language === 'english' ? ENGLISH_FULL_END : HINDI_FULL_END;
+    const ending = language === 'english'
+      ? "My recent shopping experience at Vijay Jewellers was truly amazing. The jewelry I bought has top-notch quality. The designs are unique and attractive. Prices are very reasonable, making it even more special. The staff's behavior was excellent, all very helpful and polite. I loved how they attended to all my needs. Overall, it was a great experience and I'll definitely come back for more shopping."
+      : "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा। मैंने जो ज्वेलरी खरीदी है, उसकी गुणवत्ता तो वाकई में शीर्ष वर्ग की है। डिजाइन भी बेहद अनोखे और आकर्षक हैं। कीमतें भी बहुत उचित हैं, जो इसे और भी खास बनाती हैं। स्टाफ का व्यवहार तो एकदम बेहतरीन था, सभी लोग बहुत मददगार और विनम्र थे। मुझे बहुत अच्छा लगा कि उन्होंने मेरी सभी जरूरतों का ध्यान रखा। कुल मिलाकर, यह एक बेहतरीन अनुभव रहा और मैं जरूर यहाँ फिर से खरीदारी करने आऊँगा।";
+
     const fallback = language === 'english'
-      ? `Excellent service at Vijay Jewellers! The ${randomProduct} was perfect. Highly recommend this place! ${FULL_END}`
-      : `विजय ज्वैलर्स में ${randomProduct} देखते ही पसंद आ गया। क्वालिटी शानदार, स्टाफ बहुत अच्छा। जरूर आएं! ${FULL_END}`;
+      ? `Outstanding service at Vijay Jewellers! The ${randomProduct} was perfect. Highly recommend this place! ${ending}`
+      : `विजय ज्वैलर्स में ${randomProduct} देखते ही पसंद आ गया। क्वालिटी शानदार, स्टाफ बहुत अच्छा। जरूर आएं! ${ending}`;
 
     res.json({ review: fallback });
   }
