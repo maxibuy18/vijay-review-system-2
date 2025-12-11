@@ -9,7 +9,7 @@ const client = new openai.OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-const PLACE_ID = 'CQASqQgR4RvOEBE';
+const PLACE_ID = 'CQASqGgR4RvOEBE';
 
 const PRODUCTS_FEATURES = [
   '18k hallmark gold necklace',
@@ -23,19 +23,19 @@ const PRODUCTS_FEATURES = [
 
 const OTHER_JEWELERS = [
   'तनिष्क़', 'कल्याण', 'पीसी ज्वैलर्स', 'आरा का भारत भूषण भंडार ज्वेलर्स', 'बलिया का डीपी ज्वैलर्स', 
-  'वाराणसी का कन्हैया लाल ज्वेलर्स', 'वाराणसी का नारायण दास ज्वेलर्स', 'पटना का अलंकार ज्वेलर्स', 
-  'पटना का हीरा पन्ना ज्वेलर्स', 'बक्सर के लोकल सौनार', 'डुमराव के सुनार', 'ब्रह्मपुर के ज्वेलर्स', 'गाजीपुर के ज्वेलर्स'
+  'वाराणसी का कन्हैया लाल ज्वेलर्स', 'वाराणसी का नारायण दास ज्वैलर्स', 'पटना का अलंकार ज्वैलर्स', 
+  'पटना का हीरा पन्ना ज्वैलर्स', 'बक्सर के लोकल सौनार', 'डुमराव के सुनार', 'ब्रह्मपुर के ज्वेलर्स', 'गाजीपुर के ज्वेलर्स'
 ];
 
 let requestCount = 0;
 
 const HINDI_PROMPTS = [
-  `विजय ज्वैलर्स के लिए 65-85 शब्दों में एकदम नया और अलग 5 स्टार रिव्यू लिखो। {product} का जरूर जिक्र करो। सोने की शुद्धता, नए डिजाइन, उचित कीमत का उल्लेख करो। ${Math.random() < 0.3 ? 'स्टाफ का व्यवहार अच्छा था।' : ''} ${requestCount > 18 ? Math.random() < 0.3 ? '{other_jeweler} पर चेक कराया, 18/22k सही निकला।' : '' : ''} ${Math.random() < 0.4 ? 'पुरानी ज्वेलरी की मरम्मत भी शानदार रही।' : ''} अंत में ये पैराग्राफ बिल्कुल वैसा ही डालो: "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा। मैंने जो ज्वेलरी खरीदी है, उसकी गुणवत्ता तो वाकई में शीर्ष वर्ग की है। डिजाइन भी बेहद अनोखे और आकर्षक हैं। कीमतें भी बहुत उचित हैं, जो इसे और भी खास बनाती हैं। स्टाफ का व्यवहार तो एकदम बेहतरीन था, सभी लोग बहुत मददगार और विनम्र थे। मुझे बहुत अच्छा लगा कि उन्होंने मेरी सभी जरूरतों का ध्यान रखा। कुल मिलाकर, यह एक बेहतरीन अनुभव रहा और मैं जरूर यहाँ फिर से खरीदारी करने आऊँगा।" सिर्फ हिन्दी में लिखो, कोई इंग्लिश शब्द न आए। हर बार बिल्कुल अलग लिखो।`,
+  `विजय ज्वैलर्स के लिए {word_count} शब्दों में एकदम नया और अलग 5 स्टार रिव्यू लिखो। {product} का जरूर जिक्र करो। सोने की शुद्धता, नए डिजाइन, उचित कीमत का उल्लेख करो। ${Math.random() < 0.3 ? 'स्टाफ का व्यवहार अच्छा था।' : ''} ${requestCount > 18 ? Math.random() < 0.3 ? '{other_jeweler} पर चेक कराया, 18/22k सही निकला।' : '' : ''} ${Math.random() < 0.4 ? 'पुरानी ज्वेलरी की मरम्मत भी शानदार रही।' : ''} अंत में ये पैराग्राफ बिल्कुल वैसा ही डालो: "विजय ज्वैलर्स में हाल ही में खरीदारी करने का अनुभव बहुत ही शानदार रहा। मैंने जो ज्वेलरी खरीदी है, उसकी गुणवत्ता तो वाकई में शीर्ष वर्ग की है। डिजाइन भी बेहद अनोखे और आकर्षक हैं। कीमतें भी बहुत उचित हैं, जो इसे और भी खास बनाती हैं। स्टाफ का व्यवहार तो एकदम बेहतरीन था, सभी लोग बहुत मददगार और विनम्र थे। मुझे बहुत अच्छा लगा कि उन्होंने मेरी सभी जरूरतों का ध्यान रखा। कुल मिलाकर, यह एक बेहतरीन अनुभव रहा और मैं जरूर यहाँ फिर से खरीदारी करने आऊँगा।" सिर्फ हिन्दी में लिखो, कोई इंग्लिश शब्द न आए। हर बार बिल्कुल अलग लिखो।`,
   `एक खुश ग्राहक की तरह विजय ज्वैलर्स का रिव्यू लिखो। {product} खरीदा या मरम्मत करवाई, क्वालिटी कमाल की थी। ${Math.random() < 0.3 ? 'स्टाफ ने अच्छे से गाइड किया।' : ''} ${requestCount > 18 ? Math.random() < 0.3 ? '{other_jeweler} पर चेक कराया तो 18/22k सही निकला।' : '' : ''} कार्ड से पेमेंट आसान था। ${Math.random() < 0.4 ? 'पुरानी ज्वेलरी की मरम्मत भी आसान रही।' : ''} अंत में ऊपर वाला पूरा पैराग्राफ वैरिएट करके डालो। सिर्फ हिन्दी में, बिल्कुल नया लिखो।`
 ];
 
 const ENGLISH_PROMPTS = [
-  `Write a completely new and different 5-star review for Vijay Jewellers in 65-85 words. Must mention {product}. Gold purity (18k/22k hallmark), unique designs, reasonable prices. ${Math.random() < 0.3 ? 'Staff was excellent.' : ''} ${requestCount > 18 ? Math.random() < 0.3 ? 'Checked at {other_jeweler}, 18/22k exchange policy 100% confirmed.' : '' : ''} ${Math.random() < 0.4 ? 'Old jewellery repair service was great.' : ''} End exactly with this paragraph: "My recent shopping experience at Vijay Jewellers was truly amazing. The jewelry I bought has top-notch quality. The designs are unique and attractive. Prices are very reasonable, making it even more special. The staff's behavior was excellent, all very helpful and polite. I loved how they attended to all my needs. Overall, it was a great experience and I'll definitely come back for more shopping." Write in pure English only. Never repeat any previous review.`,
+  `Write a completely new and different 5-star review for Vijay Jewellers in {word_count} words. Must mention {product}. Gold purity (18k/22k hallmark), unique designs, reasonable prices. ${Math.random() < 0.3 ? 'Staff was excellent.' : ''} ${requestCount > 18 ? Math.random() < 0.3 ? 'Checked at {other_jeweler}, 18/22k exchange policy 100% confirmed.' : '' : ''} ${Math.random() < 0.4 ? 'Old jewellery repair service was great.' : ''} End exactly with this paragraph: "My recent shopping experience at Vijay Jewellers was truly amazing. The jewelry I bought has top-notch quality. The designs are unique and attractive. Prices are very reasonable, making it even more special. The staff's behavior was excellent, all very helpful and polite. I loved how they attended to all my needs. Overall, it was a great experience and I'll definitely come back for more shopping." Write in pure English only. Never repeat any previous review.`,
   `Write a fresh 5-star review as a happy customer – bought or repaired {product}, amazing collection, trustworthy hallmark, smooth card payment. ${Math.random() < 0.3 ? 'Staff guided perfectly.' : ''} ${requestCount > 18 ? Math.random() < 0.3 ? 'Verified at {other_jeweler},' : '' : ''} End with the above paragraph. Pure English only, completely unique every time.`
 ];
 
@@ -48,6 +48,10 @@ app.post('/api/generate-review', async (req, res) => {
     return res.status(500).json({ error: 'OpenAI API key is missing' });
   }
 
+  // रैंडम लंबाई 20, 30, 40 या 50 शब्द
+  const wordCounts = [20, 30, 40, 50];
+  const wordCount = wordCounts[Math.floor(Math.random() * wordCounts.length)];
+
   const randomProduct = PRODUCTS_FEATURES[Math.floor(Math.random() * PRODUCTS_FEATURES.length)];
   const randomOtherJeweler = OTHER_JEWELERS[Math.floor(Math.random() * OTHER_JEWELERS.length)];
   const prompts = language === 'english' ? ENGLISH_PROMPTS : HINDI_PROMPTS;
@@ -56,6 +60,7 @@ app.post('/api/generate-review', async (req, res) => {
   const finalPrompt = basePrompt
     .replace(/{product}/g, randomProduct)
     .replace(/{other_jeweler}/g, randomOtherJeweler)
+    .replace(/{word_count}/g, wordCount.toString())
     + `\n\nMANDATORY: Return ONLY one complete review. Never split with --- or quotes. Write in ONLY ${language === 'english' ? 'English' : 'Hindi/Hinglish'}. Never mix languages. Make it 100% unique every time.`;
 
   try {
@@ -76,10 +81,10 @@ app.post('/api/generate-review', async (req, res) => {
       reviewText = reviewText.split('---')[0].trim();
     }
 
-    // 2. लंबाई कंट्रोल (70 शब्द तक)
+    // 2. लंबाई कंट्रोल (अधिकतम 55 शब्द)
     const words = reviewText.split(/\s+/);
-    if (words.length > 75) {
-      reviewText = words.slice(0, 70).join(' ') + '.';
+    if (words.length > 60) {
+      reviewText = words.slice(0, 55).join(' ') + '.';
     }
 
     // 3. आखिरी सफाई
